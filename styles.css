@@ -1,0 +1,14 @@
+/* Basic styling for the button - can be expanded */
+.generate-reply-button {
+    /* Example: Add a subtle hover effect */
+    transition: background-color 0.2s ease;
+}
+
+.generate-reply-button:hover:not(:disabled) {
+    background-color: #e0e0e0; /* Light grey background on hover */
+}
+
+.generate-reply-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}

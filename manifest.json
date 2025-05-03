@@ -1,0 +1,29 @@
+{
+    "manifest_version": 3,
+    "name": "X Reply Generator",
+    "version": "0.1.0",
+    "description": "Generates replies for x.com posts using Gemini API.",
+    "permissions": [
+        "scripting",
+        "activeTab",
+        "storage"
+    ],
+    "host_permissions": [
+        "*://*.x.com/*",
+        "https://generativelanguage.googleapis.com/*"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "content_scripts": [
+        {
+            "matches": ["*://x.com/*/status/*"],
+            "js": ["content.js"],
+            "css": ["styles.css"]
+        }
+    ],
+    "action": {
+        "default_title": "X Reply Generator - Set API Key (Not Implemented)",
+        "matches": ["*://*.x.com/*/status/*"]
+    }
+}
