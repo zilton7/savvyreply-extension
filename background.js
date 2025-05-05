@@ -145,7 +145,7 @@ const API_BASE_URL = "http://localhost:3000/api/v1"; // Change this to your Rail
 
 // Listen for messages from popup or content scripts
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.action === "sign_in") {
+  if (request.action === "login") {
     login(request.email, request.password)
       .then((response) => sendResponse(response))
       .catch((error) => sendResponse({ success: false, error: error.message }));
@@ -187,25 +187,15 @@ async function login(email, password) {
       }),
     });
 
-    if (!response.ok) {
-      throw new Error("Login failed");
-    }
-
     const data = await response.json();
-    const token = response.headers.get("Authorization");
-
-    if (!token) {
-      throw new Error("No authentication token received");
+    if (data.success) {
+      // Store the token in extension storage
+      chrome.storage.local.set({
+        auth_token: data.auth_token,
+        user_id: data.user_id,
+      });
+      return { success: true, user: data.data };
     }
-
-    // Store the token in Chrome storage
-    await chrome.storage.local.set({
-      authToken: token,
-      user: data.data,
-      tokenExpiry: Date.now() + 24 * 60 * 60 * 1000, // 24 hours from now
-    });
-
-    return { success: true, user: data.data };
   } catch (error) {
     console.error("Login error:", error);
     throw error;
@@ -221,7 +211,7 @@ async function logout() {
       throw new Error("Not logged in");
     }
 
-    const response = await fetch(`${API_BASE_URL}/logout`, {
+    const response = await fetch(`${API_BASE_URL}/sign_out`, {
       method: "DELETE",
       headers: {
         Authorization: token,
@@ -229,7 +219,7 @@ async function logout() {
     });
 
     // Clear stored auth data regardless of server response
-    await chrome.storage.local.remove(["authToken", "user", "tokenExpiry"]);
+    await chrome.storage.local.remove(["auth_token", "user_id"]);
 
     return { success: true };
   } catch (error) {
@@ -241,23 +231,16 @@ async function logout() {
 // Check if user is authenticated
 async function checkAuth() {
   try {
-    const { authToken, user, tokenExpiry } = await chrome.storage.local.get([
-      "authToken",
-      "user",
-      "tokenExpiry",
+    const { auth_token, user_id } = await chrome.storage.local.get([
+      "auth_token",
+      "user_id",
     ]);
 
-    if (!authToken || !tokenExpiry) {
+    if (!auth_token || !user_id) {
       return { authenticated: false };
     }
 
-    // Check if token is expired
-    if (Date.now() > tokenExpiry) {
-      await chrome.storage.local.remove(["authToken", "user", "tokenExpiry"]);
-      return { authenticated: false, reason: "Token expired" };
-    }
-
-    return { authenticated: true, user };
+    return { authenticated: true };
   } catch (error) {
     console.error("Auth check error:", error);
     throw error;
@@ -266,8 +249,8 @@ async function checkAuth() {
 
 // Helper function to get auth token
 async function getAuthToken() {
-  const { authToken } = await chrome.storage.local.get("authToken");
-  return authToken;
+  const { auth_token } = await chrome.storage.local.get("auth_token");
+  return auth_token;
 }
 
 // Optional: Add an auth token refresh mechanism

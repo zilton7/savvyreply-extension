@@ -26,8 +26,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Send login request to background script
     chrome.runtime.sendMessage(
-      { action: "sign_in", email, password },
+      { action: "login", email, password },
       function (response) {
+        debugger;
         if (response.success) {
           showLoginSuccess(response.user);
         } else {
