@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>My Extension</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>My Extension</h1>
+
+      <!-- Login Form (shown when not authenticated) -->
+      <div id="login-form">
+        <h2>Login</h2>
+        <div class="form-group">
+          <label for="email">Email:</label>
+          <input type="email" id="email" name="email" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Password:</label>
+          <input type="password" id="password" name="password" required />
+        </div>
+        <div class="form-actions">
+          <button id="login-button">Login</button>
+        </div>
+        <div id="login-error" class="error-message"></div>
+      </div>
+
+      <!-- User info (shown when authenticated) -->
+      <div id="user-info" style="display: none">
+        <h2>Welcome!</h2>
+        <p>You are logged in as: <span id="user-email"></span></p>
+        <div class="form-actions">
+          <button id="logout-button">Logout</button>
+        </div>
+      </div>
+
+      <!-- Status messages -->
+      <div id="status-message"></div>
+    </div>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
