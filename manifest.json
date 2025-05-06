@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "SavyReply Generator",
+    "name": "SavyReply Extension",
     "version": "0.1.0",
     "description": "Generates replies for x.com posts using SavvyReply.",
     "icons": {
@@ -15,16 +15,23 @@
     ],
     "host_permissions": [
         "*://*.x.com/*",
-        "https://generativelanguage.googleapis.com/*"
+        "https://savvyreply.com/*",
+        "http://localhost:3000/*"
     ],
     "background": {
         "service_worker": "background.js"
     },
     "content_scripts": [
         {
-            "matches": ["*://x.com/*/status/*"],
-            "js": ["content.js"],
-            "css": ["styles.css"]
+            "matches": [
+                "*://x.com/*/status/*"
+            ],
+            "js": [
+                "content.js"
+            ],
+            "css": [
+                "styles.css"
+            ]
         }
     ],
     "action": {
@@ -32,7 +39,10 @@
             "16": "icons/icon16.png",
             "48": "icons/icon48.png"
         },
-        "default_title": "X Reply Generator - Set API Key (Not Implemented)",
-        "matches": ["*://*.x.com/*/status/*"]
+        "default_title": "SavvyReply Extension",
+        "default_popup": "popup/popup.html",
+        "matches": [
+            "*://*.x.com/*/status/*"
+        ]
     }
 }

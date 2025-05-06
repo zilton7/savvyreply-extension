@@ -39,10 +39,40 @@ function addGenerateButton(postElement) {
   button.style.cursor = "pointer";
   button.style.border = "1px solid #ccc";
   button.style.borderRadius = "4px";
+  button.disabled = true; // Initially disable the button
+  button.title = "Checking authentication..."; // Add a tooltip
+
+  // Check authentication status
+  chrome.runtime.sendMessage({ action: "checkAuth" }, (response) => {
+    if (chrome.runtime.lastError) {
+      console.error("Auth check error:", chrome.runtime.lastError.message);
+      button.title = "Error checking authentication.";
+      // Keep button disabled if auth check fails
+      return;
+    }
+    if (response && response.authenticated) {
+      button.disabled = false; // Enable button if authenticated
+      button.title = ""; // Clear tooltip
+    } else {
+      button.title =
+        "Please log in via the extension popup to use this feature.";
+      // Keep button disabled if not authenticated
+    }
+  });
 
   button.addEventListener("click", async (event) => {
     event.stopPropagation();
     event.preventDefault();
+
+    // Double-check auth just before generating (optional but good practice)
+    const authResponse = await new Promise((resolve) => {
+      chrome.runtime.sendMessage({ action: "checkAuth" }, resolve);
+    });
+
+    if (!authResponse || !authResponse.authenticated) {
+      alert("Please log in via the extension popup first.");
+      return;
+    }
 
     console.log("X Reply Generator: Button clicked.");
     button.textContent = "Generating...";
@@ -113,9 +143,11 @@ function addGenerateButton(postElement) {
         alert(`Error generating reply: ${response.error}`);
       } else if (response.reply) {
         replyTextArea.focus();
-        // First try to remove quotes if present, then insert the text
-        const cleanedReply = response.reply.replace(/^"(.*)"$/, "$1");
-        document.execCommand("insertText", false, cleanedReply);
+        document.execCommand(
+          "insertText",
+          false,
+          response.reply.replace(/^"(.*)"$/, "$1")
+        );
       } else {
         alert("Error: Received an invalid response from the extension.");
       }
@@ -124,7 +156,12 @@ function addGenerateButton(postElement) {
       alert(`Error: ${error.message || "An unexpected error occurred."}`);
     } finally {
       button.textContent = "Generate Reply";
-      button.disabled = false;
+      // Re-enable button only if still authenticated (or handle based on initial check)
+      chrome.runtime.sendMessage({ action: "checkAuth" }, (response) => {
+        if (response && response.authenticated) {
+          button.disabled = false;
+        }
+      });
     }
   });
 
