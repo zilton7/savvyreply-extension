@@ -2,18 +2,81 @@ console.log("X Reply Generator: Content script loaded.");
 
 // --- Configuration ---
 // Updated selectors for x.com (Twitter)
-// The toolbar is often a div with role="group" inside the article
 const POST_ARTICLE_SELECTOR = 'article[data-testid="tweet"]';
 const POST_TEXT_SELECTOR = 'div[data-testid="tweetText"]';
 const REPLY_TEXTAREA_SELECTOR =
   'div[role="textbox"][data-testid="tweetTextarea_0"]';
-// Try to find a toolbar by role, as data-testid may not be present
 const TOOLBAR_SELECTOR = 'div[role="group"]';
+
+// Color scheme variables
+let isDarkMode =
+  window.matchMedia &&
+  window.matchMedia("(prefers-color-scheme: dark)").matches;
+const colorScheme = {
+  light: {
+    primaryColor: "#019863",
+    primaryHover: "#016e48",
+    textOnPrimary: "#ffffff",
+    successBg: "#e8f5e9",
+    successColor: "#019863",
+    successBorder: "#019863",
+    errorBg: "#ffebee",
+    errorColor: "#c62828",
+    errorBorder: "#ef9a9a",
+    infoBg: "#e3f2fd",
+    infoColor: "#1565c0",
+    infoBorder: "#90caf9",
+    buttonBg: "#ffffff",
+  },
+  dark: {
+    primaryColor: "#019863",
+    primaryHover: "#01b373",
+    textOnPrimary: "#ffffff",
+    successBg: "#0e3a25",
+    successColor: "#42d392",
+    successBorder: "#019863",
+    errorBg: "#442326",
+    errorColor: "#ff6b6b",
+    errorBorder: "#ef5350",
+    infoBg: "#0d3c61",
+    infoColor: "#64b5f6",
+    infoBorder: "#2196f3",
+    buttonBg: "#2d2d2d",
+  },
+};
+
+// Function to get current color scheme
+function getColors() {
+  return isDarkMode ? colorScheme.dark : colorScheme.light;
+}
+
+// Listen for color scheme changes
+if (window.matchMedia) {
+  const colorSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
+  colorSchemeQuery.addEventListener("change", (e) => {
+    isDarkMode = e.matches;
+    updateExistingButtons();
+  });
+}
+
+// Function to update existing buttons when color scheme changes
+function updateExistingButtons() {
+  const colors = getColors();
+  const buttons = document.querySelectorAll(".generate-reply-button");
+  buttons.forEach((button) => {
+    if (!button.disabled) {
+      button.style.backgroundColor = colors.buttonBg;
+      button.style.color = colors.primaryColor;
+    }
+  });
+}
 
 // --- Functions ---
 
 // Custom message display function
 function showCustomMessage(message, type = "info") {
+  const colors = getColors();
+
   // Create container if it doesn't exist
   let messageContainer = document.querySelector(".x-reply-generator-message");
   if (!messageContainer) {
@@ -36,17 +99,17 @@ function showCustomMessage(message, type = "info") {
 
   // Set styles based on message type
   if (type === "error") {
-    messageContainer.style.backgroundColor = "#ffebee";
-    messageContainer.style.color = "#c62828";
-    messageContainer.style.border = "1px solid #ef9a9a";
+    messageContainer.style.backgroundColor = colors.errorBg;
+    messageContainer.style.color = colors.errorColor;
+    messageContainer.style.border = `1px solid ${colors.errorBorder}`;
   } else if (type === "success") {
-    messageContainer.style.backgroundColor = "#e8f5e9";
-    messageContainer.style.color = "#2e7d32";
-    messageContainer.style.border = "1px solid #a5d6a7";
+    messageContainer.style.backgroundColor = colors.successBg;
+    messageContainer.style.color = colors.successColor;
+    messageContainer.style.border = `1px solid ${colors.successBorder}`;
   } else {
-    messageContainer.style.backgroundColor = "#e3f2fd";
-    messageContainer.style.color = "#1565c0";
-    messageContainer.style.border = "1px solid #90caf9";
+    messageContainer.style.backgroundColor = colors.infoBg;
+    messageContainer.style.color = colors.infoColor;
+    messageContainer.style.border = `1px solid ${colors.infoBorder}`;
   }
 
   // Set message content
@@ -70,6 +133,8 @@ function addGenerateButton(postElement) {
     return;
   }
 
+  const colors = getColors();
+
   // Try to find the toolbar (actions area) inside the post
   let toolbar = null;
   const toolbars = postElement.querySelectorAll(TOOLBAR_SELECTOR);
@@ -89,10 +154,26 @@ function addGenerateButton(postElement) {
   button.style.marginLeft = "8px";
   button.style.padding = "2px 5px";
   button.style.cursor = "pointer";
-  button.style.border = "1px solid #ccc";
+  button.style.backgroundColor = colors.buttonBg;
+  button.style.color = colors.primaryColor;
+  button.style.border = `1px solid ${colors.primaryColor}`;
   button.style.borderRadius = "4px";
   button.disabled = true; // Initially disable the button
   button.title = "Checking authentication..."; // Add a tooltip
+
+  // Add hover effect for button
+  button.onmouseover = function () {
+    if (!button.disabled) {
+      button.style.backgroundColor = colors.primaryColor;
+      button.style.color = colors.textOnPrimary;
+    }
+  };
+  button.onmouseout = function () {
+    if (!button.disabled) {
+      button.style.backgroundColor = colors.buttonBg;
+      button.style.color = colors.primaryColor;
+    }
+  };
 
   // Check authentication status
   chrome.runtime.sendMessage({ action: "checkAuth" }, (response) => {

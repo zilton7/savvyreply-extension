@@ -1,7 +1,40 @@
+:root {
+  /* Light mode variables */
+  --background-color: #ffffff;
+  --text-color: #333333;
+  --border-color: #cccccc;
+  --primary-color: #019863;
+  --primary-hover: #016e48;
+  --input-background: #ffffff;
+  --error-background: #f8d7da;
+  --error-color: #721c24;
+  --success-background: #e8f5e9;
+  --success-color: #019863;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Dark mode variables */
+    --background-color: #1e1e1e;
+    --text-color: #e0e0e0;
+    --border-color: #555555;
+    --primary-color: #019863;
+    --primary-hover: #01b373;
+    --input-background: #2d2d2d;
+    --error-background: #442326;
+    --error-color: #ff6b6b;
+    --success-background: #0e3a25;
+    --success-color: #42d392;
+  }
+}
+
 body {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .container {
@@ -13,7 +46,7 @@ h1 {
   font-size: 18px;
   margin-top: 0;
   margin-bottom: 15px;
-  color: #333;
+  color: var(--text-color);
 }
 
 h2 {
@@ -36,8 +69,10 @@ h2 {
   width: 100%;
   padding: 8px;
   box-sizing: border-box;
-  border: 1px solid #ccc;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
+  background-color: var(--input-background);
+  color: var(--text-color);
 }
 
 .form-actions {
@@ -45,21 +80,22 @@ h2 {
 }
 
 button {
-  background-color: #4285f4;
+  background-color: var(--primary-color);
   color: white;
   border: none;
   padding: 8px 16px;
   border-radius: 4px;
   cursor: pointer;
   font-size: 14px;
+  transition: background-color 0.2s;
 }
 
 button:hover {
-  background-color: #357ae8;
+  background-color: var(--primary-hover);
 }
 
 .error-message {
-  color: #d32f2f;
+  color: var(--error-color);
   margin-top: 10px;
   font-size: 12px;
 }
@@ -72,11 +108,12 @@ button:hover {
 }
 
 .success {
-  background-color: #d4edda;
-  color: #155724;
+  background-color: var(--success-background);
+  color: var(--success-color);
+  border: 1px solid var(--primary-color);
 }
 
 .error {
-  background-color: #f8d7da;
-  color: #721c24;
+  background-color: var(--error-background);
+  color: var(--error-color);
 }
