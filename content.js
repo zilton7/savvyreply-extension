@@ -12,6 +12,58 @@ const TOOLBAR_SELECTOR = 'div[role="group"]';
 
 // --- Functions ---
 
+// Custom message display function
+function showCustomMessage(message, type = "info") {
+  // Create container if it doesn't exist
+  let messageContainer = document.querySelector(".x-reply-generator-message");
+  if (!messageContainer) {
+    messageContainer = document.createElement("div");
+    messageContainer.className = "x-reply-generator-message";
+    messageContainer.style.position = "fixed";
+    messageContainer.style.top = "20px";
+    messageContainer.style.right = "20px";
+    messageContainer.style.padding = "12px 16px";
+    messageContainer.style.borderRadius = "8px";
+    messageContainer.style.boxShadow = "0 4px 12px rgba(0, 0, 0, 0.15)";
+    messageContainer.style.zIndex = "10000";
+    messageContainer.style.maxWidth = "300px";
+    messageContainer.style.fontFamily =
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif';
+    messageContainer.style.fontSize = "14px";
+    messageContainer.style.transition = "opacity 0.3s ease-in-out";
+    document.body.appendChild(messageContainer);
+  }
+
+  // Set styles based on message type
+  if (type === "error") {
+    messageContainer.style.backgroundColor = "#ffebee";
+    messageContainer.style.color = "#c62828";
+    messageContainer.style.border = "1px solid #ef9a9a";
+  } else if (type === "success") {
+    messageContainer.style.backgroundColor = "#e8f5e9";
+    messageContainer.style.color = "#2e7d32";
+    messageContainer.style.border = "1px solid #a5d6a7";
+  } else {
+    messageContainer.style.backgroundColor = "#e3f2fd";
+    messageContainer.style.color = "#1565c0";
+    messageContainer.style.border = "1px solid #90caf9";
+  }
+
+  // Set message content
+  messageContainer.textContent = message;
+  messageContainer.style.opacity = "1";
+
+  // Auto-hide after 5 seconds
+  setTimeout(() => {
+    messageContainer.style.opacity = "0";
+    setTimeout(() => {
+      if (messageContainer.parentNode) {
+        messageContainer.parentNode.removeChild(messageContainer);
+      }
+    }, 300);
+  }, 5000);
+}
+
 function addGenerateButton(postElement) {
   // Check if the button already exists
   if (postElement.querySelector(".generate-reply-button")) {
@@ -70,7 +122,10 @@ function addGenerateButton(postElement) {
     });
 
     if (!authResponse || !authResponse.authenticated) {
-      alert("Please log in via the extension popup first.");
+      showCustomMessage(
+        "Please log in via the extension popup first.",
+        "error"
+      );
       return;
     }
 
@@ -94,15 +149,16 @@ function addGenerateButton(postElement) {
 
     if (!postText) {
       console.error("X Reply Generator: Could not find post text.");
-      alert("Error: Could not find the post text.");
+      showCustomMessage("Error: Could not find the post text.", "error");
       button.textContent = "Generate Reply";
       button.disabled = false;
       return;
     }
 
     if (!replyTextArea) {
-      alert(
-        "Please click the reply button under this post before generating a reply."
+      showCustomMessage(
+        "Please click the reply button under this post before generating a reply.",
+        "error"
       );
       button.textContent = "Generate Reply";
       button.disabled = false;
@@ -136,22 +192,30 @@ function addGenerateButton(postElement) {
       );
 
       if (!response) {
-        alert(
-          "Error: No response from the extension background script. Is the extension running?"
+        showCustomMessage(
+          "Error: No response from the extension background script. Is the extension running?",
+          "error"
         );
       } else if (response.error) {
-        alert(`Error generating reply: ${response.error}`);
+        showCustomMessage(`Error generating reply: ${response.error}`, "error");
       } else if (response.reply) {
         replyTextArea.focus();
         // First try to remove quotes if present, then insert the text
         const cleanedReply = response.reply.replace(/^"(.*)"$/, "$1");
         document.execCommand("insertText", false, cleanedReply);
+        showCustomMessage("Reply generated successfully!", "success");
       } else {
-        alert("Error: Received an invalid response from the extension.");
+        showCustomMessage(
+          "Error: Received an invalid response from the extension.",
+          "error"
+        );
       }
     } catch (error) {
       console.error("X Reply Generator: Error during reply generation:", error);
-      alert(`Error: ${error.message || "An unexpected error occurred."}`);
+      showCustomMessage(
+        `Error: ${error.message || "An unexpected error occurred."}`,
+        "error"
+      );
     } finally {
       button.textContent = "Generate Reply";
       // Re-enable button only if still authenticated (or handle based on initial check)
