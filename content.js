@@ -143,11 +143,9 @@ function addGenerateButton(postElement) {
         alert(`Error generating reply: ${response.error}`);
       } else if (response.reply) {
         replyTextArea.focus();
-        document.execCommand(
-          "insertText",
-          false,
-          response.reply.replace(/^"(.*)"$/, "$1")
-        );
+        // First try to remove quotes if present, then insert the text
+        const cleanedReply = response.reply.replace(/^"(.*)"$/, "$1");
+        document.execCommand("insertText", false, cleanedReply);
       } else {
         alert("Error: Received an invalid response from the extension.");
       }
