@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "SavyReply Extension",
+    "name": "SavyReply Extension 1.0",
     "version": "0.1.0",
     "description": "Generates replies for x.com posts using SavvyReply.",
     "icons": {
@@ -19,7 +19,8 @@
         "http://localhost:3000/*"
     ],
     "background": {
-        "service_worker": "background.js"
+        "service_worker": "background.js",
+        "type": "module"
     },
     "content_scripts": [
         {

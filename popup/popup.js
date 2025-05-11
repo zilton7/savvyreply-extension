@@ -1,6 +1,10 @@
 // popup.js - Handles the popup UI and authentication
+import { ENV_NAME, getApiUrl, DEV_ENV } from "../shared/constants.js";
 
 document.addEventListener("DOMContentLoaded", function () {
+  // Display environment info
+  setupEnvironmentInfo();
+
   // Setup authentication handlers
   setupAuthHandlers();
 
@@ -16,6 +20,23 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   }
 });
+
+function setupEnvironmentInfo() {
+  const envNameEl = document.getElementById("env-name");
+  const apiUrlEl = document.getElementById("api-url");
+  const envInfoEl = document.getElementById("env-info");
+
+  if (envInfoEl) {
+    if (DEV_ENV) {
+      envNameEl.textContent = ENV_NAME;
+      apiUrlEl.textContent = getApiUrl();
+      envInfoEl.classList.add("env-dev");
+      envInfoEl.style.display = "block";
+    } else {
+      envInfoEl.style.display = "none";
+    }
+  }
+}
 
 function setupAuthHandlers() {
   const loginForm = document.getElementById("login-form");

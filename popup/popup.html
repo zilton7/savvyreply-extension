@@ -8,6 +8,11 @@
     <div class="container">
       <h1>X Reply Generator</h1>
 
+      <!-- Environment indicator -->
+      <div id="env-info" class="env-info">
+        <span id="env-name"></span>: <span id="api-url"></span>
+      </div>
+
       <!-- Login Form (shown when not authenticated) -->
       <div id="login-form">
         <h2>Login</h2>
@@ -38,6 +43,6 @@
       <div id="status-message"></div>
     </div>
 
-    <script src="popup.js"></script>
+    <script type="module" src="popup.js"></script>
   </body>
 </html>

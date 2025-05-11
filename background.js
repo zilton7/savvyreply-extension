@@ -1,10 +1,13 @@
+import { API_BASE_URL } from "./shared/constants.js";
+
 console.log("X Reply Generator: Background script loaded.");
+console.log("API_BASE_URL:", API_BASE_URL);
 
 // --- REPLY GENERATION VIA RAILS API ---
 
 // Helper: Start reply generation job on Rails backend
 function startReplyGeneration(replyToText, sendResponse) {
-  fetch("http://localhost:3000/api/v1/trigger_reply_generation", {
+  fetch(`${API_BASE_URL}/trigger_reply_generation`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -32,7 +35,7 @@ function pollForResults(jobId, sendResponse) {
   const maxAttempts = 20;
 
   function checkStatus() {
-    fetch(`http://localhost:3000/api/v1/job_status/${jobId}`)
+    fetch(`${API_BASE_URL}/job_status/${jobId}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.status === "success") {
@@ -96,8 +99,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 // AUTHENTICATION STUFF
 
 // background.js - Service worker for handling background tasks
-
-const API_BASE_URL = "http://localhost:3000/api/v1"; // Change this to your Rails API URL
 
 // Login function to authenticate with Rails backend
 async function login(email, password) {
