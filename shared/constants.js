@@ -6,15 +6,14 @@
 // export const DEV_ENV = false;
 export const DEV_ENV = true;
 
+// API path suffix
+const API_PATH = "api/v1";
 // API base URLs
-const DEV_API_BASE = "http://localhost:3000/api/v1";
-const PROD_API_BASE = "https://savvyreply.com/api/v1";
+const DEV_API_BASE = `http://localhost:3000/${API_PATH}`;
+const PROD_API_BASE = `https://savvyreply.com/${API_PATH}`;
 
 // API base URL - automatically switches based on environment
 export const API_BASE_URL = DEV_ENV ? DEV_API_BASE : PROD_API_BASE;
-
-// API path suffix
-export const API_PATH = "/api/v1";
 
 // Get the full API URL (for display purposes)
 export function getApiUrl() {
