@@ -109,16 +109,23 @@ function checkAuthStatus() {
       loginForm.style.display = "none";
       userInfo.style.display = "block";
 
-      // Optionally fetch and display user info
-      chrome.runtime.sendMessage(
-        { action: "getUserInfo" },
-        function (userResponse) {
-          if (userResponse && userResponse.user) {
-            document.getElementById("user-email").textContent =
-              userResponse.user.email;
-          }
+      // Get email directly from storage
+      chrome.storage.local.get("email", function (result) {
+        if (result.email) {
+          document.getElementById("user-email").textContent = result.email;
+        } else {
+          // Fallback to API if email not in storage
+          chrome.runtime.sendMessage(
+            { action: "getUserInfo" },
+            function (userResponse) {
+              if (userResponse && userResponse.user) {
+                document.getElementById("user-email").textContent =
+                  userResponse.user.email;
+              }
+            }
+          );
         }
-      );
+      });
     } else {
       // User is not logged in
       loginForm.style.display = "block";

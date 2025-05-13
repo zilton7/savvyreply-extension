@@ -145,6 +145,7 @@ async function login(email, password) {
       chrome.storage.local.set({
         auth_token: data.auth_token,
         user_id: data.user_id,
+        email: data.email,
       });
       return { success: true, user: data.data };
     }
