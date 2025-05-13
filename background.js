@@ -6,36 +6,62 @@ console.log("API_BASE_URL:", API_BASE_URL);
 // --- REPLY GENERATION VIA RAILS API ---
 
 // Helper: Start reply generation job on Rails backend
-function startReplyGeneration(replyToText, sendResponse) {
-  fetch(`${API_BASE_URL}/trigger_reply_generation`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      reply_to_text: replyToText,
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      if (data.job_id) {
-        // Start polling for results
-        pollForResults(data.job_id, sendResponse);
-      } else {
-        sendResponse({ error: "Failed to start reply generation job." });
-      }
+async function startReplyGeneration(replyToText, sendResponse) {
+  try {
+    const token = await getAuthToken();
+
+    if (!token) {
+      sendResponse({ error: "Authentication required. Please log in." });
+      return;
+    }
+
+    fetch(`${API_BASE_URL}/trigger_reply_generation`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+      body: JSON.stringify({
+        reply_to_text: replyToText,
+      }),
     })
-    .catch((error) => {
-      console.error("Error starting job:", error);
-      sendResponse({ error: "Error starting reply generation job." });
-    });
+      .then((response) => response.json())
+      .then((data) => {
+        if (data.job_id) {
+          // Start polling for results
+          pollForResults(data.job_id, sendResponse);
+        } else {
+          sendResponse({ error: "Failed to start reply generation job." });
+        }
+      })
+      .catch((error) => {
+        console.error("Error starting job:", error);
+        sendResponse({ error: "Error starting reply generation job." });
+      });
+  } catch (error) {
+    console.error("Authentication error:", error);
+    sendResponse({ error: "Authentication error" });
+  }
 }
 
 // Helper: Poll for job results with exponential backoff
-function pollForResults(jobId, sendResponse) {
+async function pollForResults(jobId, sendResponse) {
   let attempts = 0;
   const maxAttempts = 20;
+  const token = await getAuthToken();
+
+  if (!token) {
+    sendResponse({ error: "Authentication required. Please log in." });
+    return;
+  }
 
   function checkStatus() {
-    fetch(`${API_BASE_URL}/job_status/${jobId}`)
+    fetch(`${API_BASE_URL}/job_status/${jobId}`, {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: token,
+      },
+    })
       .then((response) => response.json())
       .then((data) => {
         if (data.status === "success") {

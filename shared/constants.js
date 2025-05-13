@@ -3,8 +3,8 @@
  */
 
 // Development environment flag - set to false for production
-// export const DEV_ENV = false;
-export const DEV_ENV = true;
+export const DEV_ENV = false;
+// export const DEV_ENV = true;
 
 // API path suffix
 const API_PATH = "api/v1";
