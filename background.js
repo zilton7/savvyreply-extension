@@ -1,8 +1,5 @@
 import { API_BASE_URL } from "./shared/constants.js";
 
-console.log("X Reply Generator: Background script loaded.");
-console.log("API_BASE_URL:", API_BASE_URL);
-
 // --- REPLY GENERATION VIA RAILS API ---
 
 // Helper: Start reply generation job on Rails backend

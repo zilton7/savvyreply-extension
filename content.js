@@ -1,5 +1,3 @@
-console.log("X Reply Generator: Content script loaded.");
-
 // --- Configuration ---
 // Updated selectors for x.com (Twitter)
 const POST_ARTICLE_SELECTOR = 'article[data-testid="tweet"]';
@@ -210,7 +208,6 @@ function addGenerateButton(postElement) {
       return;
     }
 
-    console.log("X Reply Generator: Button clicked.");
     button.textContent = "Generating...";
     button.disabled = true;
 
@@ -229,7 +226,6 @@ function addGenerateButton(postElement) {
     }
 
     if (!postText) {
-      console.error("X Reply Generator: Could not find post text.");
       showCustomMessage("Error: Could not find the post text.", "error");
       button.textContent = "Generate Reply";
       button.disabled = false;
@@ -247,10 +243,6 @@ function addGenerateButton(postElement) {
     }
 
     try {
-      console.log(
-        "X Reply Generator: Sending message to background script...",
-        postText
-      );
       const response = await new Promise((resolve, reject) => {
         chrome.runtime.sendMessage(
           {
@@ -266,11 +258,6 @@ function addGenerateButton(postElement) {
           }
         );
       });
-
-      console.log(
-        "X Reply Generator: Received response from background script:",
-        response
-      );
 
       if (!response) {
         showCustomMessage(
@@ -292,7 +279,6 @@ function addGenerateButton(postElement) {
         );
       }
     } catch (error) {
-      console.error("X Reply Generator: Error during reply generation:", error);
       showCustomMessage(
         `Error: ${error.message || "An unexpected error occurred."}`,
         "error"
@@ -348,5 +334,3 @@ const observer = new MutationObserver((mutationsList) => {
 });
 
 observer.observe(document.body, { childList: true, subtree: true });
-
-console.log("X Reply Generator: Observer started.");

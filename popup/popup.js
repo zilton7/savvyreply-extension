@@ -10,15 +10,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
   // Check current authentication status
   checkAuthStatus();
-
-  // Listen for color scheme changes
-  if (window.matchMedia) {
-    const colorSchemeQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    colorSchemeQuery.addEventListener("change", (e) => {
-      // You could add specific handling here if needed
-      console.log("Color scheme changed to:", e.matches ? "dark" : "light");
-    });
-  }
 });
 
 function setupEnvironmentInfo() {
