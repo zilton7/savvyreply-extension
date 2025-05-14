@@ -27,6 +27,8 @@ async function startReplyGeneration(replyToText, sendResponse) {
         if (data.job_id) {
           // Start polling for results
           pollForResults(data.job_id, sendResponse);
+        } else if (data.error) {
+          sendResponse({ error: data.error });
         } else {
           sendResponse({ error: "Failed to start reply generation job." });
         }

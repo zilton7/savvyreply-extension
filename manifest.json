@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "SavyReply Extension 1.0",
+    "name": "SavyReply Extension 0.1.0",
     "version": "0.1.0",
-    "description": "Generates replies for x.com posts using SavvyReply.",
+    "description": "AI reply suggestions for x.com posts via SavvyReply.com.",
     "icons": {
         "16": "icons/icon16.png",
         "48": "icons/icon48.png",
